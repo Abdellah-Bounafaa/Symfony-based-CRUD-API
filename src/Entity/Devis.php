@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\DevisRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DevisRepository::class)]
@@ -24,6 +26,20 @@ class Devis
 
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $frequence_prix = null;
+
+    #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'devis')]
+    private ?Client $client = null;
+
+    /**
+     * @var Collection<int, Voiture>
+     */
+    #[ORM\ManyToMany(targetEntity: Voiture::class, inversedBy: 'devis')]
+    private Collection $voitures;
+
+    public function __construct()
+    {
+        $this->voitures = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -71,6 +87,41 @@ class Devis
     public function setFrequencePrix(string $frequence_prix): self
     {
         $this->frequence_prix = $frequence_prix;
+        return $this;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): self
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Voiture>
+     */
+    public function getVoitures(): Collection
+    {
+        return $this->voitures;
+    }
+
+    public function addVoiture(Voiture $voiture): static
+    {
+        if (!$this->voitures->contains($voiture)) {
+            $this->voitures->add($voiture);
+        }
+
+        return $this;
+    }
+
+    public function removeVoiture(Voiture $voiture): static
+    {
+        $this->voitures->removeElement($voiture);
+
         return $this;
     }
 }
