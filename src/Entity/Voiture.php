@@ -6,6 +6,8 @@ use App\Repository\VoitureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: VoitureRepository::class)]
 class Voiture
@@ -13,28 +15,34 @@ class Voiture
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['voiture:read', 'voiture:write', 'devis:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['voiture:read', 'voiture:write', 'devis:read'])]
     private ?string $numero_immatriculation = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(name: '`usage`', type: 'string', length: 255)]
+    #[Groups(['voiture:read', 'voiture:write', 'devis:read'])]
     private ?string $usage = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['voiture:read', 'voiture:write', 'devis:read'])]
     private ?string $emplacement = null;
 
     #[ORM\Column(type: 'date')]
+    #[Groups(['voiture:read', 'voiture:write', 'devis:read'])]
     private ?\DateTimeInterface $date_achat = null;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'voitures')]
+    #[Groups(['voiture:read', 'voiture:write', 'devis:read'])]
     private ?Client $client = null;
 
-    /**
-     * @var Collection<int, Devis>
-     */
     #[ORM\ManyToMany(targetEntity: Devis::class, mappedBy: 'voitures')]
+    #[Groups(['voiture:read', 'voiture:write'])]
+    #[MaxDepth(1)]
     private Collection $devis;
+
     public function __construct()
     {
         $this->devis = new ArrayCollection();
