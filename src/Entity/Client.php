@@ -52,9 +52,9 @@ class Client
         return $this;
     }
 
-    public function getDateNaissance(): ?\DateTimeInterface
+    public function getFormattedDateNaissance(): string
     {
-        return $this->date_naissance;
+        return $this->date_naissance->format('Y-m-d');
     }
 
     public function setDateNaissance(\DateTimeInterface $date_naissance): self
