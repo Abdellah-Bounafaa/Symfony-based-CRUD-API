@@ -17,8 +17,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class DevisController extends AbstractController
 {
     #[Route('/', name: 'devis_index', methods: ['GET'])]
-    #[Route('/', name: 'devis_index', methods: ['GET'])]
-    public function index(DevisRepository $devisRepository): JsonResponse
+    public function index(DevisRepository $devisRepository, SerializerInterface $serializer): JsonResponse
     {
         $devisList = $devisRepository->findAll();
         $data = [];
@@ -30,22 +29,16 @@ class DevisController extends AbstractController
                 'dateEffet' => $devis->getDateEffet()->format('Y-m-d H:i:s'),
                 'prix' => $devis->getPrix(),
                 'frequencePrix' => $devis->getFrequencePrix(),
-                'client' => $devis->getClient() ? $devis->getClient()->getId() : null,
-                'voitures' => array_map(function ($voiture) {
-                    return [
-                        'id' => $voiture->getId(),
-                        'numero_immatriculation' => $voiture->getNumeroImmatriculation(),
-                        'usage' => $voiture->getUsage(),
-                        'emplacement' => $voiture->getEmplacement(),
-                        'date_achat' => $voiture->getDateAchat()->format('Y-m-d'),
-                        'client' => $voiture->getClient() ? $voiture->getClient()->getId() : null,
-                    ];
+                'client' => $devis->getClient() ? $serializer->normalize($devis->getClient(), null, ['groups' => 'client:read']) : null,
+                'voitures' => array_map(function ($voiture) use ($serializer) {
+                    return $serializer->normalize($voiture, null, ['groups' => 'voiture:read']);
                 }, $devis->getVoitures()->toArray()),
             ];
         }
 
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
+
     #[Route('/create', name: 'devis_new', methods: ['POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
