@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\Voiture;
+use App\Repository\ClientRepository;
 use App\Repository\VoitureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +23,7 @@ class VoitureController extends AbstractController
     }
 
     #[Route('/create', name: 'voiture_new', methods: ['POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function new(Request $request, EntityManagerInterface $entityManager, ClientRepository $clientRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -30,6 +32,13 @@ class VoitureController extends AbstractController
         $voiture->setUsage($data['usage']);
         $voiture->setEmplacement($data['emplacement']);
         $voiture->setDateAchat(new \DateTime($data['date_achat']));
+
+        if (isset($data['client_id'])) {
+            $client = $clientRepository->find($data['client_id']);
+            if ($client) {
+                $voiture->setClient($client);
+            }
+        }
 
         $entityManager->persist($voiture);
         $entityManager->flush();
@@ -44,7 +53,7 @@ class VoitureController extends AbstractController
     }
 
     #[Route('/{id}/update', name: 'voiture_edit', methods: ['POST'])]
-    public function edit(Request $request, Voiture $voiture, EntityManagerInterface $entityManager): JsonResponse
+    public function edit(Request $request, Voiture $voiture, EntityManagerInterface $entityManager, ClientRepository $clientRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -52,6 +61,13 @@ class VoitureController extends AbstractController
         $voiture->setUsage($data['usage']);
         $voiture->setEmplacement($data['emplacement']);
         $voiture->setDateAchat(new \DateTime($data['date_achat']));
+
+        if (isset($data['client_id'])) {
+            $client = $clientRepository->find($data['client_id']);
+            if ($client) {
+                $voiture->setClient($client);
+            }
+        }
 
         $entityManager->flush();
 
