@@ -6,6 +6,7 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -13,30 +14,28 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['client:read', 'client:write', 'devis:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(length: 255)]
+    #[Groups(['client:read', 'client:write', 'devis:read'])]
     private ?string $nom = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(length: 255)]
+    #[Groups(['client:read', 'client:write', 'devis:read'])]
     private ?string $prenom = null;
 
-    #[ORM\Column(type: 'date')]
-    private ?\DateTimeInterface $date_naissance = null;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['client:read', 'client:write', 'devis:read'])]
+    private ?\DateTimeInterface $dateNaissance = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $est_personne = null;
-
-    #[ORM\OneToMany(targetEntity: Devis::class, mappedBy: 'client')]
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Devis::class)]
+    #[Groups(['client:read', 'client:write'])]
     private Collection $devis;
-
-    #[ORM\OneToMany(targetEntity: Voiture::class, mappedBy: 'client')]
-    private Collection $voitures;
 
     public function __construct()
     {
         $this->devis = new ArrayCollection();
-        $this->voitures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -68,23 +67,12 @@ class Client
 
     public function getDateNaissance(): ?\DateTimeInterface
     {
-        return $this->date_naissance;
+        return $this->dateNaissance;
     }
 
-    public function setDateNaissance(\DateTimeInterface $date_naissance): self
+    public function setDateNaissance(\DateTimeInterface $dateNaissance): self
     {
-        $this->date_naissance = $date_naissance;
-        return $this;
-    }
-
-    public function getEstPersonne(): ?bool
-    {
-        return $this->est_personne;
-    }
-
-    public function setEstPersonne(bool $est_personne): self
-    {
-        $this->est_personne = $est_personne;
+        $this->dateNaissance = $dateNaissance;
         return $this;
     }
 
@@ -112,36 +100,6 @@ class Client
             // set the owning side to null (unless already changed)
             if ($devis->getClient() === $this) {
                 $devis->setClient(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Voiture[]
-     */
-    public function getVoitures(): Collection
-    {
-        return $this->voitures;
-    }
-
-    public function addVoiture(Voiture $voiture): self
-    {
-        if (!$this->voitures->contains($voiture)) {
-            $this->voitures[] = $voiture;
-            $voiture->setClient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVoiture(Voiture $voiture): self
-    {
-        if ($this->voitures->removeElement($voiture)) {
-            // set the owning side to null (unless already changed)
-            if ($voiture->getClient() === $this) {
-                $voiture->setClient(null);
             }
         }
 
