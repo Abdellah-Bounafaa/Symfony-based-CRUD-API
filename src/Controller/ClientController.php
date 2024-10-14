@@ -16,7 +16,7 @@ class ClientController extends AbstractController
     public function index(ClientRepository $clientRepository): JsonResponse
     {
         $clients = $clientRepository->findAll();
-        return $this->json($clients);
+        return $this->json($clients, 200, [], ['groups' => 'client:read']);
     }
 
     #[Route('/api/clients/create', name: 'app_client_create', methods: ['POST'])]
@@ -33,7 +33,7 @@ class ClientController extends AbstractController
         $entityManager->persist($client);
         $entityManager->flush();
 
-        return $this->json($client);
+        return $this->json($client, 201, [], ['groups' => 'client:read']);
     }
 
     #[Route('/api/clients/update/{id}', name: 'app_client_update', methods: ['POST'])]
@@ -53,7 +53,7 @@ class ClientController extends AbstractController
 
         $entityManager->flush();
 
-        return $this->json($client);
+        return $this->json($client, 200, [], ['groups' => 'client:read']);
     }
 
     #[Route('/api/clients/{id}', name: 'app_client_delete', methods: ['DELETE'])]
@@ -78,6 +78,6 @@ class ClientController extends AbstractController
             return $this->json(['message' => 'Client not found'], 404);
         }
 
-        return $this->json($client);
+        return $this->json($client, 200, [], ['groups' => 'client:read']);
     }
 }
