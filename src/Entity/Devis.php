@@ -6,6 +6,8 @@ use App\Repository\DevisRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: DevisRepository::class)]
 class Devis
@@ -13,27 +15,32 @@ class Devis
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['devis:read', 'devis:write'])]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 36, unique: true)]
+    #[ORM\Column(length: 255)]
+    #[Groups(['devis:read', 'devis:write'])]
     private ?string $numero = null;
 
-    #[ORM\Column(type: 'date')]
-    private ?\DateTimeInterface $date_effet = null;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['devis:read', 'devis:write'])]
+    private ?\DateTimeInterface $dateEffet = null;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column]
+    #[Groups(['devis:read', 'devis:write'])]
     private ?float $prix = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $frequence_prix = null;
+    #[ORM\Column(length: 255)]
+    #[Groups(['devis:read', 'devis:write'])]
+    private ?string $frequencePrix = null;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'devis')]
+    #[Groups(['devis:read', 'devis:write'])]
     private ?Client $client = null;
 
-    /**
-     * @var Collection<int, Voiture>
-     */
     #[ORM\ManyToMany(targetEntity: Voiture::class, inversedBy: 'devis')]
+    #[Groups(['devis:read', 'devis:write'])]
+    #[MaxDepth(1)]
     private Collection $voitures;
 
     public function __construct()
@@ -59,12 +66,12 @@ class Devis
 
     public function getDateEffet(): ?\DateTimeInterface
     {
-        return $this->date_effet;
+        return $this->dateEffet;
     }
 
-    public function setDateEffet(\DateTimeInterface $date_effet): self
+    public function setDateEffet(\DateTimeInterface $dateEffet): self
     {
-        $this->date_effet = $date_effet;
+        $this->dateEffet = $dateEffet;
         return $this;
     }
 
@@ -81,12 +88,12 @@ class Devis
 
     public function getFrequencePrix(): ?string
     {
-        return $this->frequence_prix;
+        return $this->frequencePrix;
     }
 
-    public function setFrequencePrix(string $frequence_prix): self
+    public function setFrequencePrix(string $frequencePrix): self
     {
-        $this->frequence_prix = $frequence_prix;
+        $this->frequencePrix = $frequencePrix;
         return $this;
     }
 
