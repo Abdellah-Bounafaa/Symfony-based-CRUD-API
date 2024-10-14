@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -29,8 +30,13 @@ class Client
     #[Groups(['client:read', 'client:write', 'devis:read'])]
     private ?\DateTimeInterface $dateNaissance = null;
 
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['client:read', 'client:write', 'devis:read'])]
+    private ?bool $estPersonne = null;
+
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Devis::class)]
     #[Groups(['client:read', 'client:write'])]
+    #[MaxDepth(1)]
     private Collection $devis;
 
     public function __construct()
@@ -73,6 +79,17 @@ class Client
     public function setDateNaissance(\DateTimeInterface $dateNaissance): self
     {
         $this->dateNaissance = $dateNaissance;
+        return $this;
+    }
+
+    public function getEstPersonne(): ?bool
+    {
+        return $this->estPersonne;
+    }
+
+    public function setEstPersonne(bool $estPersonne): self
+    {
+        $this->estPersonne = $estPersonne;
         return $this;
     }
 
