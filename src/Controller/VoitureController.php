@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Client;
 use App\Entity\Voiture;
 use App\Repository\ClientRepository;
 use App\Repository\VoitureRepository;
@@ -19,7 +18,7 @@ class VoitureController extends AbstractController
     public function index(VoitureRepository $voitureRepository): JsonResponse
     {
         $voitures = $voitureRepository->findAll();
-        return $this->json($voitures);
+        return $this->json($voitures, 200, [], ['groups' => 'voiture:read']);
     }
 
     #[Route('/create', name: 'voiture_new', methods: ['POST'])]
