@@ -210,10 +210,3 @@ This project is a Symfony-based API that manages clients, devis, and voitures. B
     ```http
     DELETE /api/voitures/{id}
     ```
-
-## Running Tests
-
-To run the tests, use the following command:
-
-```sh
-php bin/phpunit
